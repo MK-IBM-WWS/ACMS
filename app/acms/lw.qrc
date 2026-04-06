@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/labels">
+        <file>label.png</file>
+        <file>logout.png</file>
+    </qresource>
+</RCC>
