@@ -1,12 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'hrwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 69 (Qt 6.10.2)
+** Created by: The Qt Meta Object Compiler version 69 (Qt 6.10.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
 #include "../../hrwindow.h"
+#include <QtGui/qtextcursor.h>
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
@@ -18,7 +19,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'hrwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 69
-#error "This file was generated using the moc from 6.10.2. It"
+#error "This file was generated using the moc from 6.10.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -40,12 +41,30 @@ template <> constexpr inline auto HrWindow::qt_create_metaobjectdata<qt_meta_tag
     QtMocHelpers::StringRefStorage qt_stringData {
         "HrWindow",
         "on_btnlogout_clicked",
-        ""
+        "",
+        "on_btnaddstaff_clicked",
+        "on_btneditstaff_clicked",
+        "on_btnadddepo_clicked",
+        "on_btneditdepo_clicked",
+        "on_btnpositionreport_clicked",
+        "on_btnaccessreport_clicked"
     };
 
     QtMocHelpers::UintData qt_methods {
         // Slot 'on_btnlogout_clicked'
         QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btnaddstaff_clicked'
+        QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btneditstaff_clicked'
+        QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btnadddepo_clicked'
+        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btneditdepo_clicked'
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btnpositionreport_clicked'
+        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'on_btnaccessreport_clicked'
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -70,6 +89,12 @@ void HrWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: _t->on_btnlogout_clicked(); break;
+        case 1: _t->on_btnaddstaff_clicked(); break;
+        case 2: _t->on_btneditstaff_clicked(); break;
+        case 3: _t->on_btnadddepo_clicked(); break;
+        case 4: _t->on_btneditdepo_clicked(); break;
+        case 5: _t->on_btnpositionreport_clicked(); break;
+        case 6: _t->on_btnaccessreport_clicked(); break;
         default: ;
         }
     }
@@ -95,14 +120,14 @@ int HrWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 7;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
+        if (_id < 7)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 1;
+        _id -= 7;
     }
     return _id;
 }

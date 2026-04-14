@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QCoreApplication>
+#include <dbconfig.h>
 
 namespace Ui {
 class SettingsWindow;
@@ -29,16 +30,10 @@ private slots:
 private:
     Ui::SettingsWindow *ui;
 
-    struct DbConfig {
-        QString host;
-        int port;
-    };
-
     const QString DB_USERNAME_LOGIN = "loginuser";
     const QString DB_PASSWORD_LOGIN = "CV6";
     const QString DB_NAME = "acms";
 
-    DbConfig loadConfig();
     bool saveConfig(const DbConfig &config);
     bool testDbConnection(const DbConfig &config);
     void loadSettingsToUi();

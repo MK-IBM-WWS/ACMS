@@ -22,46 +22,6 @@ LoginWindow::~LoginWindow()
     delete ui;
 }
 
-LoginWindow::DbConfig LoginWindow::loadConfig()
-{
-    DbConfig config;
-
-    QString configPath = QCoreApplication::applicationDirPath() + "/config.json";
-
-    QFile file(configPath);
-    if (!file.exists()) {
-        qDebug() << "Config file not found, using default values";
-        config.host = "localhost";
-        config.port = 228;
-        return config;
-    }
-
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Cannot open config file";
-        config.host = "localhost";
-        config.port = 228;
-        return config;
-    }
-
-    QByteArray jsonData = file.readAll();
-    file.close();
-    QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-
-    if (doc.isNull()) {
-        qDebug() << "Invalid config, using default values";
-        config.host = "localhost";
-        config.port = 228;
-        return config;
-    }
-
-    QJsonObject obj = doc.object();
-
-    config.host = obj["host"].toString("localhost");
-    config.port = obj["port"].toInt(228);
-
-    return config;
-}
-
 // Проверка соединения с БД
 bool LoginWindow::testDbConnection(const DbConfig &config)
 {
@@ -85,9 +45,10 @@ bool LoginWindow::testDbConnection(const DbConfig &config)
 }
 
 // Аутентификация пользователя
-bool LoginWindow::authenticateUser(const QString &login, const QString &password, QString &role)
+bool LoginWindow::authenticateUser(const QString &login, const QString &password)
 {
-    DbConfig config = loadConfig();
+    DbConfig config;
+    config.loadConfig();
 
     // Используем уникальное имя для соединения
     QString connectionName = QString("auth_%1").arg(QUuid::createUuid().toString());
@@ -107,7 +68,7 @@ bool LoginWindow::authenticateUser(const QString &login, const QString &password
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT user_role FROM users WHERE login = :login AND passphrase = :password");
+    query.prepare("SELECT user_role, group_pass FROM users WHERE login = :login AND passphrase = :password");
     query.bindValue(":login", login);
     query.bindValue(":password", password);
 
@@ -121,12 +82,12 @@ bool LoginWindow::authenticateUser(const QString &login, const QString &password
 
     bool result = false;
     if (query.next()) {
-        role = query.value(0).toString();
+        this->role = query.value(0).toString();
+        this->groupPass = query.value(1).toString();
         result = true;
     }
 
-    // Важно: сначала закрываем, потом удаляем
-    query.finish(); // Завершаем запрос
+    query.finish();
     db.close();
     QSqlDatabase::removeDatabase(connectionName);
 
@@ -147,7 +108,8 @@ void LoginWindow::on_btnlogin_clicked()
     }
 
     // Загружаем конфиг и проверяем соединение
-    DbConfig config = loadConfig();
+    DbConfig config;
+    config.loadConfig();
 
     if (!testDbConnection(config)) {
         QMessageBox::critical(this, "Ошибка соединения",
@@ -158,9 +120,7 @@ void LoginWindow::on_btnlogin_clicked()
         return;
     }
 
-    // Аутентификация пользователя
-    QString role;
-    if (!authenticateUser(login, password, role)) {
+    if (!authenticateUser(login, password)) {
         QMessageBox::warning(this, "Ошибка авторизации",
                              "Неверный логин или пароль");
         ui->lepass->clear();
@@ -171,21 +131,21 @@ void LoginWindow::on_btnlogin_clicked()
     // Успешная авторизация - открываем соответствующее окно
     QWidget *roleWindow = nullptr;
 
-    if (role == "Admin") {
-        roleWindow = new AdminWindow(login, nullptr);
+    if (this->role == "Admin") {
+        roleWindow = new AdminWindow(login, password, nullptr);
     }
-    else if (role == "HR") {
-        roleWindow = new HrWindow(login, nullptr);
+    else if (this->role == "HR") {
+        roleWindow = new HrWindow(login, password, nullptr);
     }
-    else if (role == "Controller") {
-        roleWindow = new ControllerWindow(login, nullptr);
+    else if (this->role == "Controller") {
+        roleWindow = new ControllerWindow(login, this->groupPass, nullptr);
     }
-    else if (role == "PD") {
-        roleWindow = new PdWindow(login, nullptr);
+    else if (this->role == "PD") {
+        roleWindow = new PdWindow(login, password, nullptr);
     }
     else {
         QMessageBox::critical(this, "Ошибка",
-                              "Неизвестная роль пользователя: " + role);
+                              "Неизвестная роль пользователя: " + this->role);
         return;
     }
 

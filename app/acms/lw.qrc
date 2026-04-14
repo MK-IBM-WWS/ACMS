@@ -2,5 +2,7 @@
     <qresource prefix="/labels">
         <file>label.png</file>
         <file>logout.png</file>
+        <file>search.png</file>
+        <file>update.png</file>
     </qresource>
 </RCC>

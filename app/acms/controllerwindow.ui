@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>710</width>
+    <width>1050</width>
     <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>710</width>
+    <width>1050</width>
     <height>400</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>710</width>
+    <width>1050</width>
     <height>400</height>
    </size>
   </property>
@@ -34,13 +34,13 @@
     <widget class="QFrame" name="frame">
      <property name="minimumSize">
       <size>
-       <width>690</width>
+       <width>1030</width>
        <height>91</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>690</width>
+       <width>1030</width>
        <height>91</height>
       </size>
      </property>
@@ -236,13 +236,13 @@
           <widget class="QComboBox" name="cbaccesstype">
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>200</width>
              <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
@@ -265,17 +265,17 @@
          </item>
          <item row="1" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
+           <item alignment="Qt::AlignmentFlag::AlignLeft">
             <widget class="QLineEdit" name="letime">
              <property name="minimumSize">
               <size>
-               <width>100</width>
+               <width>200</width>
                <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>100</width>
+               <width>200</width>
                <height>30</height>
               </size>
              </property>
@@ -285,13 +285,13 @@
             <widget class="QPushButton" name="lenow">
              <property name="minimumSize">
               <size>
-               <width>75</width>
+               <width>90</width>
                <height>30</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>75</width>
+               <width>90</width>
                <height>30</height>
               </size>
              </property>
@@ -327,13 +327,13 @@
           <widget class="QLineEdit" name="lepass">
            <property name="minimumSize">
             <size>
-             <width>183</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>183</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
@@ -358,13 +358,13 @@
           <widget class="QLineEdit" name="lecontrol">
            <property name="minimumSize">
             <size>
-             <width>183</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>183</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
@@ -389,13 +389,13 @@
           <widget class="QComboBox" name="cbsolution">
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>200</width>
              <height>30</height>
             </size>
            </property>
@@ -437,7 +437,7 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
+         <item alignment="Qt::AlignmentFlag::AlignRight">
           <widget class="QLabel" name="label_11">
            <property name="font">
             <font>
@@ -455,7 +455,7 @@
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignmentFlag::AlignLeft">
           <widget class="QLineEdit" name="lecheckpass">
            <property name="minimumSize">
             <size>
@@ -502,13 +502,13 @@
         <widget class="QTableWidget" name="twgroups">
          <property name="minimumSize">
           <size>
-           <width>315</width>
-           <height>20</height>
+           <width>538</width>
+           <height>178</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>315</width>
+           <width>538</width>
            <height>178</height>
           </size>
          </property>

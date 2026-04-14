@@ -1,11 +1,12 @@
 #include "pdwindow.h"
 #include "ui_pdwindow.h"
 #include "loginwindow.h"
+#include <dbconfig.h>
 
-PdWindow::PdWindow(QString &login, QWidget *parent)
+PdWindow::PdWindow(QString &login, QString &password, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PdWindow)
-    , m_login(login)
+    , m_login(login), m_password(password)
 {
     ui->setupUi(this);
     ui->llogin->setText(login);

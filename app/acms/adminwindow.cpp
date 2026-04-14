@@ -1,11 +1,12 @@
 #include "adminwindow.h"
 #include "ui_adminwindow.h"
 #include "loginwindow.h"
+#include "dbconfig.h"
 
-AdminWindow::AdminWindow(QString &login, QWidget *parent)
+AdminWindow::AdminWindow(QString &login, QString &password, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::AdminWindow)
-    , m_login(login)
+    , m_login(login), m_password(password)
 {
     ui->setupUi(this);
     ui->llogin->setText(login);

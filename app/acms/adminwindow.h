@@ -12,7 +12,7 @@ class AdminWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit AdminWindow(QString &login, QWidget *parent = nullptr);
+    explicit AdminWindow(QString &login, QString &password, QWidget *parent = nullptr);
     ~AdminWindow();
 
 private slots:
@@ -20,6 +20,7 @@ private slots:
 private:
     Ui::AdminWindow *ui;
     QString m_login;
+    QString m_password;
 };
 
 #endif // ADMINWINDOW_H

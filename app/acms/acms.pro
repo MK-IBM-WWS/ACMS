@@ -1,4 +1,4 @@
-QT       += core gui sql
+QT       += core gui sql printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,28 +12,45 @@ SOURCES += \
     adminwindow.cpp \
     cogroupconsists.cpp \
     controllerwindow.cpp \
+    dbconfig.cpp \
+    hradddepo.cpp \
+    hraddstaff.cpp \
+    hreditdepo.cpp \
+    hreditstaff.cpp \
     hrwindow.cpp \
     main.cpp \
     loginwindow.cpp \
     pdwindow.cpp \
+    printwindow.cpp \
     settingswindow.cpp
 
 HEADERS += \
     adminwindow.h \
     cogroupconsists.h \
     controllerwindow.h \
+    dbconfig.h \
+    hradddepo.h \
+    hraddstaff.h \
+    hreditdepo.h \
+    hreditstaff.h \
     hrwindow.h \
     loginwindow.h \
     pdwindow.h \
+    printwindow.h \
     settingswindow.h
 
 FORMS += \
     adminwindow.ui \
     cogroupconsists.ui \
     controllerwindow.ui \
+    hradddepo.ui \
+    hraddstaff.ui \
+    hreditdepo.ui \
+    hreditstaff.ui \
     hrwindow.ui \
     loginwindow.ui \
     pdwindow.ui \
+    printwindow.ui \
     settingswindow.ui
 
 # Default rules for deployment.

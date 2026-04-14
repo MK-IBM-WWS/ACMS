@@ -72,9 +72,9 @@ public:
     {
         if (ControllerWindow->objectName().isEmpty())
             ControllerWindow->setObjectName("ControllerWindow");
-        ControllerWindow->resize(710, 400);
-        ControllerWindow->setMinimumSize(QSize(710, 400));
-        ControllerWindow->setMaximumSize(QSize(710, 400));
+        ControllerWindow->resize(1050, 400);
+        ControllerWindow->setMinimumSize(QSize(1050, 400));
+        ControllerWindow->setMaximumSize(QSize(1050, 400));
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/labels/label.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         ControllerWindow->setWindowIcon(icon);
@@ -82,8 +82,8 @@ public:
         gridLayout->setObjectName("gridLayout");
         frame = new QFrame(ControllerWindow);
         frame->setObjectName("frame");
-        frame->setMinimumSize(QSize(690, 91));
-        frame->setMaximumSize(QSize(690, 91));
+        frame->setMinimumSize(QSize(1030, 91));
+        frame->setMaximumSize(QSize(1030, 91));
         frame->setLayoutDirection(Qt::LayoutDirection::LeftToRight);
         frame->setAutoFillBackground(false);
         frame->setStyleSheet(QString::fromUtf8("background-color: rgb(186, 255, 134);"));
@@ -193,8 +193,8 @@ public:
 
         cbaccesstype = new QComboBox(ControllerWindow);
         cbaccesstype->setObjectName("cbaccesstype");
-        cbaccesstype->setMinimumSize(QSize(100, 0));
-        cbaccesstype->setMaximumSize(QSize(100, 30));
+        cbaccesstype->setMinimumSize(QSize(200, 0));
+        cbaccesstype->setMaximumSize(QSize(200, 30));
 
         formLayout->setWidget(0, QFormLayout::ItemRole::FieldRole, cbaccesstype);
 
@@ -208,15 +208,15 @@ public:
         horizontalLayout_3->setObjectName("horizontalLayout_3");
         letime = new QLineEdit(ControllerWindow);
         letime->setObjectName("letime");
-        letime->setMinimumSize(QSize(100, 30));
-        letime->setMaximumSize(QSize(100, 30));
+        letime->setMinimumSize(QSize(200, 30));
+        letime->setMaximumSize(QSize(200, 30));
 
-        horizontalLayout_3->addWidget(letime);
+        horizontalLayout_3->addWidget(letime, 0, Qt::AlignmentFlag::AlignLeft);
 
         lenow = new QPushButton(ControllerWindow);
         lenow->setObjectName("lenow");
-        lenow->setMinimumSize(QSize(75, 30));
-        lenow->setMaximumSize(QSize(75, 30));
+        lenow->setMinimumSize(QSize(90, 30));
+        lenow->setMaximumSize(QSize(90, 30));
         QFont font5;
         font5.setFamilies({QString::fromUtf8("Carlito")});
         font5.setBold(true);
@@ -235,8 +235,8 @@ public:
 
         lepass = new QLineEdit(ControllerWindow);
         lepass->setObjectName("lepass");
-        lepass->setMinimumSize(QSize(183, 30));
-        lepass->setMaximumSize(QSize(183, 30));
+        lepass->setMinimumSize(QSize(200, 30));
+        lepass->setMaximumSize(QSize(200, 30));
 
         formLayout->setWidget(2, QFormLayout::ItemRole::FieldRole, lepass);
 
@@ -248,8 +248,8 @@ public:
 
         lecontrol = new QLineEdit(ControllerWindow);
         lecontrol->setObjectName("lecontrol");
-        lecontrol->setMinimumSize(QSize(183, 30));
-        lecontrol->setMaximumSize(QSize(183, 30));
+        lecontrol->setMinimumSize(QSize(200, 30));
+        lecontrol->setMaximumSize(QSize(200, 30));
 
         formLayout->setWidget(3, QFormLayout::ItemRole::FieldRole, lecontrol);
 
@@ -261,8 +261,8 @@ public:
 
         cbsolution = new QComboBox(ControllerWindow);
         cbsolution->setObjectName("cbsolution");
-        cbsolution->setMinimumSize(QSize(100, 30));
-        cbsolution->setMaximumSize(QSize(100, 30));
+        cbsolution->setMinimumSize(QSize(200, 30));
+        cbsolution->setMaximumSize(QSize(200, 30));
 
         formLayout->setWidget(4, QFormLayout::ItemRole::FieldRole, cbsolution);
 
@@ -293,14 +293,14 @@ public:
         label_11->setFont(font4);
         label_11->setAlignment(Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter);
 
-        horizontalLayout_4->addWidget(label_11);
+        horizontalLayout_4->addWidget(label_11, 0, Qt::AlignmentFlag::AlignRight);
 
         lecheckpass = new QLineEdit(ControllerWindow);
         lecheckpass->setObjectName("lecheckpass");
         lecheckpass->setMinimumSize(QSize(100, 30));
         lecheckpass->setMaximumSize(QSize(100, 30));
 
-        horizontalLayout_4->addWidget(lecheckpass);
+        horizontalLayout_4->addWidget(lecheckpass, 0, Qt::AlignmentFlag::AlignLeft);
 
         lecheckgroup = new QPushButton(ControllerWindow);
         lecheckgroup->setObjectName("lecheckgroup");
@@ -315,8 +315,8 @@ public:
 
         twgroups = new QTableWidget(ControllerWindow);
         twgroups->setObjectName("twgroups");
-        twgroups->setMinimumSize(QSize(315, 20));
-        twgroups->setMaximumSize(QSize(315, 178));
+        twgroups->setMinimumSize(QSize(538, 178));
+        twgroups->setMaximumSize(QSize(538, 178));
 
         verticalLayout_3->addWidget(twgroups);
 

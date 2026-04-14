@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QDebug>
+#include <dbconfig.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LoginWindow; }
@@ -29,19 +30,14 @@ private slots:
 
 private:
     Ui::LoginWindow *ui;
-
-    struct DbConfig {
-        QString host;
-        int port;
-    };
-
+    QString role;
+    QString groupPass;
     const QString DB_USERNAME_LOGIN = "loginuser";
     const QString DB_PASSWORD_LOGIN = "CV6";
     const QString DB_NAME = "acms";
 
-    DbConfig loadConfig();
     bool testDbConnection(const DbConfig &config);
-    bool authenticateUser(const QString &login, const QString &password, QString &role);
+    bool authenticateUser(const QString &login, const QString &password);
 };
 
 #endif // LOGINWINDOW_H

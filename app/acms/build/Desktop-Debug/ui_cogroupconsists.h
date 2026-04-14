@@ -40,9 +40,9 @@ public:
     {
         if (CoGroupConsists->objectName().isEmpty())
             CoGroupConsists->setObjectName("CoGroupConsists");
-        CoGroupConsists->resize(485, 382);
-        CoGroupConsists->setMinimumSize(QSize(485, 382));
-        CoGroupConsists->setMaximumSize(QSize(485, 382));
+        CoGroupConsists->resize(700, 382);
+        CoGroupConsists->setMinimumSize(QSize(700, 382));
+        CoGroupConsists->setMaximumSize(QSize(700, 382));
         gridLayout = new QGridLayout(CoGroupConsists);
         gridLayout->setObjectName("gridLayout");
         verticalLayout = new QVBoxLayout();
@@ -62,8 +62,8 @@ public:
 
         lagroup = new QLabel(CoGroupConsists);
         lagroup->setObjectName("lagroup");
-        lagroup->setMinimumSize(QSize(80, 20));
-        lagroup->setMaximumSize(QSize(80, 20));
+        lagroup->setMinimumSize(QSize(250, 20));
+        lagroup->setMaximumSize(QSize(250, 20));
         QFont font1;
         font1.setFamilies({QString::fromUtf8("Carlito")});
         font1.setPointSize(14);
@@ -81,8 +81,8 @@ public:
 
         ladate = new QLabel(CoGroupConsists);
         ladate->setObjectName("ladate");
-        ladate->setMinimumSize(QSize(70, 20));
-        ladate->setMaximumSize(QSize(70, 20));
+        ladate->setMinimumSize(QSize(120, 20));
+        ladate->setMaximumSize(QSize(120, 20));
         ladate->setFont(font1);
 
         horizontalLayout->addWidget(ladate);
@@ -103,6 +103,7 @@ public:
 
         btnok = new QPushButton(CoGroupConsists);
         btnok->setObjectName("btnok");
+        btnok->setMinimumSize(QSize(200, 30));
 
         verticalLayout->addWidget(btnok);
 

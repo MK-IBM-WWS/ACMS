@@ -12,13 +12,14 @@ class PdWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit PdWindow(QString &login, QWidget *parent = nullptr);
+    explicit PdWindow(QString &login, QString &password, QWidget *parent = nullptr);
     ~PdWindow();
 private slots:
     void on_btnlogout_clicked();
 private:
     Ui::PdWindow *ui;
     QString m_login;
+    QString m_password;
 };
 
 #endif // PDWINDOW_H
