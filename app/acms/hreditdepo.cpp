@@ -3,7 +3,6 @@
 #include "hrwindow.h"
 #include <QTableWidgetItem>
 #include <QHeaderView>
-#include <QDebug>
 
 HrEditDepo::HrEditDepo(HrWindow *hrWindow, QString m_login, QString m_password, QWidget *parent)
     : QWidget(parent)
@@ -18,10 +17,8 @@ HrEditDepo::HrEditDepo(HrWindow *hrWindow, QString m_login, QString m_password, 
 {
     ui->setupUi(this);
 
-    // Отображаем логин
     ui->llogin->setText(login);
 
-    // Настройка таблицы сотрудников
     ui->twstaff->setColumnCount(5);
     QStringList headers = {"ID", "ФИО", "Телефон", "Должность", "Статус", "Отдел"};
     ui->twstaff->setHorizontalHeaderLabels(headers);
@@ -38,13 +35,9 @@ HrEditDepo::HrEditDepo(HrWindow *hrWindow, QString m_login, QString m_password, 
         QMessageBox::warning(this, "Ошибка", "Нет подключения к базе данных");
     }
 
-    // Загружаем список отделов
     loadDepartmentsList();
-
-    // Настраиваем автодополнение для поиска
     setupSearchCompleter();
 
-    // Загружаем первый отдел
     if (!departmentIds.isEmpty()) {
         currentDepartmentIndex = 0;
         loadDepartmentData(departmentIds[currentDepartmentIndex]);
@@ -90,8 +83,6 @@ void HrEditDepo::loadDepartmentsList()
             departmentIds.append(id);
             searchSuggestions.append(name + " | " + address);
         }
-    } else {
-        qDebug() << "Error loading departments list:" << query.lastError().text();
     }
 }
 
@@ -103,7 +94,6 @@ bool HrEditDepo::loadDepartmentData(int departmentId)
     query.bindValue(":id", departmentId);
 
     if (!query.exec() || !query.next()) {
-        qDebug() << "Error loading department data:" << query.lastError().text();
         return false;
     }
 
@@ -113,7 +103,6 @@ bool HrEditDepo::loadDepartmentData(int departmentId)
     ui->lefio->setText(query.value(3).toString());
     ui->lework->setText(query.value(4).toString());
 
-    // Загружаем сотрудников отдела
     loadStaffData(currentDepartmentId);
 
     return true;
@@ -133,31 +122,18 @@ void HrEditDepo::loadStaffData(int departmentId)
     query.bindValue(":dept_id", departmentId);
 
     if (!query.exec()) {
-        qDebug() << "Error loading staff data:" << query.lastError().text();
         return;
     }
 
     int row = 0;
     while (query.next()) {
         ui->twstaff->insertRow(row);
-
-        // staff_id (скрытый)
         ui->twstaff->setItem(row, 0, new QTableWidgetItem(query.value(0).toString()));
-
-        // ФИО
         ui->twstaff->setItem(row, 1, new QTableWidgetItem(query.value(1).toString()));
-
-        // Телефон
         ui->twstaff->setItem(row, 2, new QTableWidgetItem(query.value(2).toString()));
-
-        // Должность
         ui->twstaff->setItem(row, 3, new QTableWidgetItem(query.value(3).toString()));
-
-        // Статус
         QString status = query.value(4).toBool() ? "Работает" : "Уволен";
         ui->twstaff->setItem(row, 4, new QTableWidgetItem(status));
-
-        // Отдел (название вместо ID)
         ui->twstaff->setItem(row, 5, new QTableWidgetItem(query.value(5).toString()));
 
         row++;
@@ -166,7 +142,6 @@ void HrEditDepo::loadStaffData(int departmentId)
 
 void HrEditDepo::updateDepartmentFields()
 {
-    // Метод для обновления UI после изменений
     if (currentDepartmentId != -1) {
         loadDepartmentData(currentDepartmentId);
     }
@@ -244,7 +219,6 @@ bool HrEditDepo::saveDepartmentChanges()
         return false;
     }
 
-    // Обновляем список отделов
     loadDepartmentsList();
     setupSearchCompleter();
 
@@ -261,7 +235,6 @@ bool HrEditDepo::deleteDepartment()
 
     QString deptName = ui->ledeponame->text();
 
-    // Запрос подтверждения
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Подтверждение удаления",
                                                               QString("Вы действительно хотите удалить отдел '%1'?\n"
                                                                       "Все сотрудники этого отдела останутся в базе данных, но будут откреплены от отдела.")
@@ -272,13 +245,11 @@ bool HrEditDepo::deleteDepartment()
         return false;
     }
 
-    // Начинаем транзакцию
     if (!db.transaction()) {
         QMessageBox::critical(this, "Ошибка", "Не удалось начать транзакцию");
         return false;
     }
 
-    // Обновляем сотрудников - устанавливаем department_id в NULL
     QSqlQuery updateQuery(db);
     updateQuery.prepare("UPDATE staff SET department_id = NULL WHERE department_id = :id");
     updateQuery.bindValue(":id", currentDepartmentId);
@@ -290,7 +261,6 @@ bool HrEditDepo::deleteDepartment()
         return false;
     }
 
-    // Удаляем отдел
     QSqlQuery deleteQuery(db);
     deleteQuery.prepare("DELETE FROM departments WHERE department_id = :id");
     deleteQuery.bindValue(":id", currentDepartmentId);
@@ -302,19 +272,16 @@ bool HrEditDepo::deleteDepartment()
         return false;
     }
 
-    // Подтверждаем транзакцию
     if (!db.commit()) {
         QMessageBox::critical(this, "Ошибка", "Не удалось подтвердить транзакцию");
         return false;
     }
 
-    // Обновляем список отделов
     loadDepartmentsList();
     setupSearchCompleter();
 
     QMessageBox::information(this, "Успех", "Отдел успешно удален");
 
-    // Переходим к следующему отделу или очищаем поля
     if (!departmentIds.isEmpty()) {
         if (currentDepartmentIndex >= departmentIds.size()) {
             currentDepartmentIndex = departmentIds.size() - 1;
@@ -331,7 +298,6 @@ bool HrEditDepo::deleteDepartment()
     return true;
 }
 
-// Слоты
 void HrEditDepo::on_btnlogout_clicked()
 {
     QWidgetList topLevelWidgets = QApplication::topLevelWidgets();
@@ -423,12 +389,10 @@ void HrEditDepo::on_btnabout_clicked()
 
 QString HrEditDepo::generateDepartmentReportHtml()
 {
-    // Проверяем, что есть данные для отчета
     if (currentDepartmentId == -1) {
         return QString();
     }
 
-    // Собираем данные о сотрудниках для HTML таблицы
     QStringList staffRows;
     int workingCount = 0;
     int firedCount = 0;
@@ -439,14 +403,12 @@ QString HrEditDepo::generateDepartmentReportHtml()
         QString position = ui->twstaff->item(row, 3)->text();
         QString status = ui->twstaff->item(row, 4)->text();
 
-        // Считаем статистику
         if (status == "Работает") {
             workingCount++;
         } else {
             firedCount++;
         }
 
-        // Экранируем специальные символы HTML
         fio = fio.toHtmlEscaped();
         phone = phone.toHtmlEscaped();
         position = position.toHtmlEscaped();
@@ -456,11 +418,8 @@ QString HrEditDepo::generateDepartmentReportHtml()
                          .arg(fio, phone, position, status);
     }
 
-    // Получаем текущую дату и время
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString dateTimeStr = currentDateTime.toString("dd.MM.yyyy HH:mm:ss");
-
-    // Экранируем данные отдела
     QString deptName = ui->ledeponame->text().toHtmlEscaped();
     QString address = ui->leaddress->text().toHtmlEscaped();
     QString chiefFio = ui->lefio->text().toHtmlEscaped();
@@ -579,7 +538,6 @@ QString HrEditDepo::generateDepartmentReportHtml()
 </html>
     )";
 
-    // Создаем строки таблицы с нумерацией
     QString numberedStaffRows;
     for (int i = 0; i < staffRows.size(); ++i) {
         QString row = staffRows[i];
@@ -587,23 +545,21 @@ QString HrEditDepo::generateDepartmentReportHtml()
         numberedStaffRows += row + "\n";
     }
 
-    // Если нет сотрудников, вставляем сообщение
     if (ui->twstaff->rowCount() == 0) {
         numberedStaffRows = "<tr><td colspan='5' align='center'><i>Нет сотрудников в отделе</i></td></tr>";
     }
 
-    // Заполняем шаблон данными
-    html = html.arg(dateTimeStr)                         // %1
-               .arg(userLogin)                           // %2
-               .arg(deptName)                            // %3
-               .arg(address)                             // %4
-               .arg(chiefFio)                            // %5
-               .arg(activity)                            // %6
-               .arg(ui->twstaff->rowCount())             // %7
-               .arg(workingCount)                        // %8
-               .arg(firedCount)                          // %9
-               .arg(numberedStaffRows)                   // %10
-               .arg(chiefFio.split(" ").value(0, ""));   // %11 (фамилия начальника)
+    html = html.arg(dateTimeStr)
+               .arg(userLogin)
+               .arg(deptName)
+               .arg(address)
+               .arg(chiefFio)
+               .arg(activity)
+               .arg(ui->twstaff->rowCount())
+               .arg(workingCount)
+               .arg(firedCount)
+               .arg(numberedStaffRows)
+               .arg(chiefFio.split(" ").value(0, ""));
 
     return html;
 }
@@ -615,7 +571,6 @@ void HrEditDepo::on_btnsavereport_clicked()
         return;
     }
 
-    // Генерируем HTML для отчета
     QString html = generateDepartmentReportHtml();
 
     if (html.isEmpty()) {
@@ -623,10 +578,7 @@ void HrEditDepo::on_btnsavereport_clicked()
         return;
     }
 
-    // Открываем окно предварительного просмотра
     PrintWindow *printWindow = new PrintWindow(html);
     printWindow->setAttribute(Qt::WA_DeleteOnClose);
     printWindow->show();
-
-    qDebug() << "Открыто окно предварительного просмотра отчета";
 }

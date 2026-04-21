@@ -13,19 +13,14 @@ ControllerWindow::ControllerWindow(QString &login, QString &password, QWidget *p
     ui->setupUi(this);
     ui->llogin->setText(login);
 
-    // Подключаемся к базе данных
     if (!connectToDatabase()) {
         QMessageBox::critical(this, "Ошибка", "Не удалось подключиться к базе данных!");
         return;
     }
 
-    // Настраиваем комбобоксы
     setupComboBoxes();
-
-    // Настраиваем автодополнение для контроллера
     setupControllerAutoComplete();
 
-    // Настраиваем таблицу для отображения групп
     ui->twgroups->setColumnCount(4);
     ui->twgroups->setHorizontalHeaderLabels(QStringList() << "Название группы" << "Дата назначения" << "Дата окончания" << "ID группы");
     ui->twgroups->horizontalHeader()->setStretchLastSection(true);
@@ -33,7 +28,6 @@ ControllerWindow::ControllerWindow(QString &login, QString &password, QWidget *p
     ui->twgroups->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->twgroups->setColumnHidden(3, true);
 
-    // Настраиваем подсказки для полей ввода
     ui->lepass->setPlaceholderText("Введите номер пропуска");
     ui->lecontrol->setPlaceholderText("Объект | Адрес");
     ui->lecheckpass->setPlaceholderText("Введите номер пропуска");
@@ -56,11 +50,10 @@ bool ControllerWindow::connectToDatabase()
     db.setHostName(config.host);
     db.setPort(config.port);
     db.setDatabaseName("acms");
-    db.setUserName(DB_USERNAME);
+    db.setUserName(m_login);
     db.setPassword(m_password);
 
     if (!db.open()) {
-        qDebug() << "Database error:" << db.lastError().text();
         return false;
     }
 
@@ -69,29 +62,22 @@ bool ControllerWindow::connectToDatabase()
 
 void ControllerWindow::setupComboBoxes()
 {
-    // Настройка комбобокса типа доступа
     ui->cbaccesstype->addItem("Вход", "IN");
     ui->cbaccesstype->addItem("Выход", "OUT");
-
-    // Настройка комбобокса решения
     ui->cbsolution->addItem("Ожидает", "Pending");
     ui->cbsolution->addItem("Принят", "Accepted");
     ui->cbsolution->addItem("Отклонен", "Rejected");
-
-    // Устанавливаем текущее время в поле letime
     ui->letime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 }
 
 void ControllerWindow::setupControllerAutoComplete()
 {
-    // Загружаем все контроллеры из БД
     QSqlQuery query("SELECT object_name, address FROM access_controller ORDER BY object_name");
 
     QStringList controllerList;
     while (query.next()) {
         QString objectName = query.value(0).toString();
         QString address = query.value(1).toString();
-        // Форматируем для отображения: "Объект | Адрес"
         controllerList << QString("%1 | %2").arg(objectName).arg(address);
     }
 
@@ -125,7 +111,6 @@ bool ControllerWindow::insertAccessFact(int passId, const QString &objectName, c
     utcTime.setTimeSpec(Qt::UTC);
     int controllerId;
     if (!getControllerIdByNameAndAddress(objectName, address, controllerId)) {
-        qDebug() << "Controller not found:" << objectName << address;
         return false;
     }
 
@@ -139,7 +124,6 @@ bool ControllerWindow::insertAccessFact(int passId, const QString &objectName, c
     query.bindValue(":controller_id", controllerId);
 
     if (!query.exec()) {
-        qDebug() << "Insert error:" << query.lastError().text();
         return false;
     }
 
@@ -258,22 +242,18 @@ void ControllerWindow::on_lepass_textChanged(const QString &text)
 
 void ControllerWindow::on_lecontrol_textChanged(const QString &text)
 {
-    // Показываем подсказку при вводе
     if (!text.isEmpty()) {
-        // Разделяем по символу |
         QStringList parts = text.split("|");
 
         if (parts.size() >= 2) {
             QString objectName = parts[0].trimmed();
             QString address = parts.mid(1).join("|").trimmed();
-
-            // Проверяем существует ли такой контроллер
             int controllerId;
             if (getControllerIdByNameAndAddress(objectName, address, controllerId)) {
-                ui->lecontrol->setToolTip(QString("✓ Контроллер найден (ID: %1)").arg(controllerId));
+                ui->lecontrol->setToolTip(QString("Контроллер найден (ID: %1)").arg(controllerId));
                 ui->lecontrol->setStyleSheet("QLineEdit { background-color: #d4ffd4; }");
             } else {
-                ui->lecontrol->setToolTip("✗ Контроллер не найден");
+                ui->lecontrol->setToolTip("Контроллер не найден");
                 ui->lecontrol->setStyleSheet("QLineEdit { background-color: #ffd4d4; }");
             }
         } else {
@@ -288,7 +268,6 @@ void ControllerWindow::on_lecontrol_textChanged(const QString &text)
 
 void ControllerWindow::on_lecontrol_editingFinished()
 {
-    // Дополнительная проверка при завершении редактирования
     QString text = ui->lecontrol->text();
     if (!text.isEmpty()) {
         QStringList parts = text.split("|");
@@ -312,20 +291,17 @@ void ControllerWindow::on_lecontrol_editingFinished()
 
 void ControllerWindow::on_btnregister_clicked()
 {
-    // Получаем данные из формы
     QString passText = ui->lepass->text();
     QString controlText = ui->lecontrol->text();
     QString accessTimeStr = ui->letime->text();
     QString accessType = ui->cbaccesstype->currentData().toString();
     QString solution = ui->cbsolution->currentData().toString();
 
-    // Проверяем заполненность полей
     if (passText.isEmpty() || controlText.isEmpty() || accessTimeStr.isEmpty()) {
         QMessageBox::warning(this, "Ошибка", "Пожалуйста, заполните все поля!");
         return;
     }
 
-    // Проверяем корректность ID пропуска
     bool passOk;
     int passId = passText.toInt(&passOk);
     if (!passOk) {
@@ -333,13 +309,11 @@ void ControllerWindow::on_btnregister_clicked()
         return;
     }
 
-    // Проверяем существование пропуска
     if (!checkPassExists(passId)) {
         QMessageBox::warning(this, "Ошибка", "Пропуск с таким номером не существует!");
         return;
     }
 
-    // Разбираем строку контроллера на объект и адрес (разделитель |)
     QStringList parts = controlText.split("|");
     if (parts.size() < 2) {
         QMessageBox::warning(this, "Ошибка",
@@ -358,7 +332,6 @@ void ControllerWindow::on_btnregister_clicked()
         return;
     }
 
-    // Проверяем существование контроллера
     int controllerId;
     if (!getControllerIdByNameAndAddress(objectName, address, controllerId)) {
         QMessageBox::warning(this, "Ошибка",
@@ -367,13 +340,11 @@ void ControllerWindow::on_btnregister_clicked()
         return;
     }
 
-    // Преобразуем строку времени в QDateTime
     QDateTime accessTime = QDateTime::fromString(accessTimeStr, "yyyy-MM-dd hh:mm:ss");
     if (!accessTime.isValid()) {
         accessTime = QDateTime::currentDateTime();
     }
 
-    // Добавляем запись в базу данных
     if (insertAccessFact(passId, objectName, address, accessType, solution, accessTime)) {
         QMessageBox::information(this, "Успех", "Запись о доступе успешно добавлена!");
         clearForm();
@@ -414,21 +385,18 @@ void ControllerWindow::on_lecheckgroup_clicked()
 
 void ControllerWindow::on_btngroupconsist_clicked()
 {
-    // Получаем выбранную строку в таблице
     int currentRow = ui->twgroups->currentRow();
     if (currentRow < 0) {
         QMessageBox::warning(this, "Ошибка", "Пожалуйста, выберите группу доступа в таблице!");
         return;
     }
 
-    // Проверяем, что это не сообщение об отсутствии групп
     QTableWidgetItem *item = ui->twgroups->item(currentRow, 0);
     if (!item || item->text() == "Нет групп доступа" || item->text() == "Пропуск не найден") {
         QMessageBox::warning(this, "Ошибка", "Невозможно получить информацию о выбранной группе!");
         return;
     }
 
-    // Получаем ID группы из скрытого столбца
     QTableWidgetItem *idItem = ui->twgroups->item(currentRow, 3);
     if (!idItem) {
         QMessageBox::warning(this, "Ошибка", "Не удалось получить ID группы!");
@@ -438,7 +406,6 @@ void ControllerWindow::on_btngroupconsist_clicked()
     int groupId = idItem->text().toInt();
     QString groupName = ui->twgroups->item(currentRow, 0)->text();
 
-    // Открываем окно с составом группы
     CoGroupConsists *groupWindow = new CoGroupConsists(groupId, nullptr);
     groupWindow->setAttribute(Qt::WA_DeleteOnClose);
     groupWindow->show();

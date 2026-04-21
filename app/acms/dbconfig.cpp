@@ -17,12 +17,10 @@ void DbConfig::loadConfig()
     QFile file(configPath);
 
     if (!file.exists()) {
-        qDebug() << "Config file not found, using default values";
         return;
     }
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Cannot open config file, using default values";
         return;
     }
 
@@ -31,7 +29,6 @@ void DbConfig::loadConfig()
 
     QJsonDocument doc = QJsonDocument::fromJson(jsonData);
     if (doc.isNull()) {
-        qDebug() << "Invalid JSON format, using default values";
         return;
     }
 
@@ -53,7 +50,6 @@ bool DbConfig::saveConfig()
 
     QFile file(configPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Cannot save config file";
         return false;
     }
 

@@ -5,7 +5,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
-#include <QDebug>
 #include <QCoreApplication>
 
 class DbConfig

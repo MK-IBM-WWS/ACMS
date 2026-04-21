@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HrEditDepo</class>
- <widget class="QWidget" name="HrEditDepo">
+ <class>AmEditControl</class>
+ <widget class="QWidget" name="AmEditControl">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>721</width>
-    <height>523</height>
+    <width>704</width>
+    <height>352</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>721</width>
-    <height>523</height>
+    <width>704</width>
+    <height>352</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -54,51 +54,6 @@
       <enum>QFrame::Shadow::Plain</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item alignment="Qt::AlignmentFlag::AlignHCenter">
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <family>Carlito</family>
-            <pointsize>16</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>АИС СКУД</string>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignmentFlag::AlignHCenter">
-         <widget class="QLabel" name="label_2">
-          <property name="minimumSize">
-           <size>
-            <width>201</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>201</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Carlito</family>
-            <pointsize>12</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Просмотр и редактирование
-                   отделов</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="minimumSize">
@@ -126,6 +81,39 @@
          <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <family>Carlito</family>
+            <pointsize>16</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>АИС СКУД</string>
+          </property>
+         </widget>
+        </item>
+        <item alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Carlito</family>
+            <pointsize>12</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Просмотр и редактирование
+      контроллеров доступа</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item row="0" column="2">
        <spacer name="horizontalSpacer">
@@ -227,7 +215,7 @@
        </layout>
       </item>
       <item row="0" column="3">
-       <spacer name="horizontalSpacer_4">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Orientation::Horizontal</enum>
         </property>
@@ -243,7 +231,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
@@ -256,15 +244,25 @@
           </font>
          </property>
          <property name="text">
-          <string>Название  отдела</string>
+          <string>Объект</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="ledeponame">
+        <widget class="QLineEdit" name="leobjectname">
          <property name="minimumSize">
           <size>
-           <width>300</width>
+           <width>150</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="leaddress">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
            <height>20</height>
           </size>
          </property>
@@ -280,21 +278,31 @@
           </font>
          </property>
          <property name="text">
-          <string>Адрес</string>
+          <string>Адрес объекта</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="leaddress">
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lemodel">
          <property name="minimumSize">
           <size>
-           <width>300</width>
+           <width>150</width>
            <height>20</height>
           </size>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="leipv4">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="label_6">
          <property name="font">
           <font>
@@ -304,21 +312,11 @@
           </font>
          </property>
          <property name="text">
-          <string>ФИО начальника</string>
+          <string>Модель контроллера</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="lefio">
-         <property name="minimumSize">
-          <size>
-           <width>300</width>
-           <height>20</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_8">
          <property name="font">
           <font>
@@ -328,26 +326,67 @@
           </font>
          </property>
          <property name="text">
-          <string>Род деятельности</string>
+          <string>Сетевой адрес</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="lework">
+        <widget class="QComboBox" name="cbstatus">
          <property name="minimumSize">
           <size>
-           <width>300</width>
+           <width>340</width>
+           <height>32</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="font">
+          <font>
+           <family>Carlito</family>
+           <pointsize>14</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Статус</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="leshedule">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
            <height>20</height>
           </size>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="font">
+          <font>
+           <family>Carlito</family>
+           <pointsize>14</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>График работы</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2"/>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -355,7 +394,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>80</width>
+             <width>40</width>
              <height>20</height>
             </size>
            </property>
@@ -447,65 +486,6 @@
           <size>
            <width>20</width>
            <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnsavereport">
-         <property name="font">
-          <font>
-           <family>Carlito</family>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Сохранить отчет по отделу</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnabout">
-         <property name="font">
-          <font>
-           <family>Carlito</family>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Подробнее о сотруднике</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QTableWidget" name="twstaff">
-       <property name="minimumSize">
-        <size>
-         <width>580</width>
-         <height>183</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
           </size>
          </property>
         </spacer>

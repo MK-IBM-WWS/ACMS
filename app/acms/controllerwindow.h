@@ -7,7 +7,6 @@
 #include <QSqlError>
 #include <QMessageBox>
 #include <QDateTime>
-#include <QDebug>
 #include <QCompleter>
 #include <QStringListModel>
 #include <cogroupconsists.h>
@@ -40,8 +39,6 @@ private:
     QString m_login;
     QString m_password;
     QSqlDatabase db;
-
-    const QString DB_USERNAME = "control";
 
     QCompleter *m_controllerCompleter;
     QStringListModel *m_controllerModel;

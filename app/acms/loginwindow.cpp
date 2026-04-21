@@ -12,6 +12,7 @@
 LoginWindow::LoginWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::LoginWindow)
+    , m_passwordVisible(false)
 {
     ui->setupUi(this);
     ui->lepass->setEchoMode(QLineEdit::Password);
@@ -22,7 +23,6 @@ LoginWindow::~LoginWindow()
     delete ui;
 }
 
-// Проверка соединения с БД
 bool LoginWindow::testDbConnection(const DbConfig &config)
 {
     QString connectionName = QString("test_%1").arg(QUuid::createUuid().toString());
@@ -44,13 +44,11 @@ bool LoginWindow::testDbConnection(const DbConfig &config)
     return result;
 }
 
-// Аутентификация пользователя
 bool LoginWindow::authenticateUser(const QString &login, const QString &password)
 {
     DbConfig config;
     config.loadConfig();
 
-    // Используем уникальное имя для соединения
     QString connectionName = QString("auth_%1").arg(QUuid::createUuid().toString());
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", connectionName);
@@ -68,7 +66,7 @@ bool LoginWindow::authenticateUser(const QString &login, const QString &password
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT user_role, group_pass FROM users WHERE login = :login AND passphrase = :password");
+    query.prepare("SELECT user_role FROM users WHERE login = :login AND passphrase = :password");
     query.bindValue(":login", login);
     query.bindValue(":password", password);
 
@@ -83,7 +81,6 @@ bool LoginWindow::authenticateUser(const QString &login, const QString &password
     bool result = false;
     if (query.next()) {
         this->role = query.value(0).toString();
-        this->groupPass = query.value(1).toString();
         result = true;
     }
 
@@ -94,20 +91,17 @@ bool LoginWindow::authenticateUser(const QString &login, const QString &password
     return result;
 }
 
-// Обработчик кнопки входа
 void LoginWindow::on_btnlogin_clicked()
 {
     QString login = ui->lelogin->text().trimmed();
     QString password = ui->lepass->text();
 
-    // Проверка на пустые поля
     if (login.isEmpty() || password.isEmpty()) {
         QMessageBox::warning(this, "Ошибка ввода",
                              "Пожалуйста, введите логин и пароль");
         return;
     }
 
-    // Загружаем конфиг и проверяем соединение
     DbConfig config;
     config.loadConfig();
 
@@ -128,7 +122,6 @@ void LoginWindow::on_btnlogin_clicked()
         return;
     }
 
-    // Успешная авторизация - открываем соответствующее окно
     QWidget *roleWindow = nullptr;
 
     if (this->role == "Admin") {
@@ -138,7 +131,7 @@ void LoginWindow::on_btnlogin_clicked()
         roleWindow = new HrWindow(login, password, nullptr);
     }
     else if (this->role == "Controller") {
-        roleWindow = new ControllerWindow(login, this->groupPass, nullptr);
+        roleWindow = new ControllerWindow(login, password, nullptr);
     }
     else if (this->role == "PD") {
         roleWindow = new PdWindow(login, password, nullptr);
@@ -156,7 +149,17 @@ void LoginWindow::on_btnlogin_clicked()
     }
 }
 
-// Обработчик кнопки настроек
+void LoginWindow::on_btnshowpass_clicked()
+{
+    m_passwordVisible = !m_passwordVisible;
+
+    if (m_passwordVisible) {
+        ui->lepass->setEchoMode(QLineEdit::Normal);
+    } else {
+        ui->lepass->setEchoMode(QLineEdit::Password);
+    }
+}
+
 void LoginWindow::on_btnsettings_clicked(){
     SettingsWindow *settingsWindow = new SettingsWindow(nullptr);
     settingsWindow->setAttribute(Qt::WA_DeleteOnClose);

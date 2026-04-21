@@ -10,6 +10,10 @@ CONFIG += c++17
 
 SOURCES += \
     adminwindow.cpp \
+    amaddcontrol.cpp \
+    amadduser.cpp \
+    ameditcontrol.cpp \
+    amedituser.cpp \
     cogroupconsists.cpp \
     controllerwindow.cpp \
     dbconfig.cpp \
@@ -20,12 +24,20 @@ SOURCES += \
     hrwindow.cpp \
     main.cpp \
     loginwindow.cpp \
+    pdaddgroup.cpp \
+    pdaddpass.cpp \
+    pdeditgroup.cpp \
+    pdeditpass.cpp \
     pdwindow.cpp \
     printwindow.cpp \
     settingswindow.cpp
 
 HEADERS += \
     adminwindow.h \
+    amaddcontrol.h \
+    amadduser.h \
+    ameditcontrol.h \
+    amedituser.h \
     cogroupconsists.h \
     controllerwindow.h \
     dbconfig.h \
@@ -35,12 +47,20 @@ HEADERS += \
     hreditstaff.h \
     hrwindow.h \
     loginwindow.h \
+    pdaddgroup.h \
+    pdaddpass.h \
+    pdeditgroup.h \
+    pdeditpass.h \
     pdwindow.h \
     printwindow.h \
     settingswindow.h
 
 FORMS += \
     adminwindow.ui \
+    amaddcontrol.ui \
+    amadduser.ui \
+    ameditcontrol.ui \
+    amedituser.ui \
     cogroupconsists.ui \
     controllerwindow.ui \
     hradddepo.ui \
@@ -49,6 +69,10 @@ FORMS += \
     hreditstaff.ui \
     hrwindow.ui \
     loginwindow.ui \
+    pdaddgroup.ui \
+    pdaddpass.ui \
+    pdeditgroup.ui \
+    pdeditpass.ui \
     pdwindow.ui \
     printwindow.ui \
     settingswindow.ui

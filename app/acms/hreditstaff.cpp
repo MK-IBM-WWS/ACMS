@@ -5,7 +5,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QMessageBox>
-#include <QDebug>
 
 HrEditStaff::HrEditStaff(HrWindow *hrWindow, QString &m_login, QString &m_password, int staff_id, QWidget *parent)
     : QWidget(parent)
@@ -21,11 +20,7 @@ HrEditStaff::HrEditStaff(HrWindow *hrWindow, QString &m_login, QString &m_passwo
     , searchModel(nullptr)
 {
     ui->setupUi(this);
-
-    // Отображаем логин
     ui->llogin->setText(login);
-
-    // Настраиваем ComboBox для статуса работы
     ui->cbiswork->addItem("Работает", true);
     ui->cbiswork->addItem("Уволен", false);
 
@@ -36,27 +31,17 @@ HrEditStaff::HrEditStaff(HrWindow *hrWindow, QString &m_login, QString &m_passwo
         QMessageBox::warning(this, "Ошибка", "Нет подключения к базе данных");
     }
 
-    // Загружаем список отделов для автодополнения
     loadDepartments();
-
-    // Загружаем список сотрудников для навигации
     loadStaffList();
-
-    // Загружаем подсказки для поиска
     loadSearchSuggestions();
 
-    // Подключаем сигналы
     connect(ui->ledepo, &QLineEdit::textChanged, this, &HrEditStaff::on_ledepo_textChanged);
     connect(ui->lesearch, &QLineEdit::textChanged, this, &HrEditStaff::on_lesearch_textChanged);
 
-    // Загружаем данные
     if (staff_id != -1) {
-        // Если передан ID, загружаем эту запись
         loadStaffData(staff_id);
-        // Находим индекс в списке
         currentIndex = staffIds.indexOf(staff_id);
     } else {
-        // Иначе загружаем первую запись
         if (!staffIds.isEmpty()) {
             currentIndex = 0;
             loadStaffData(staffIds[currentIndex]);
@@ -105,8 +90,6 @@ void HrEditStaff::loadDepartments()
         depCompleter->setCaseSensitivity(Qt::CaseInsensitive);
         depCompleter->setFilterMode(Qt::MatchContains);
         ui->ledepo->setCompleter(depCompleter);
-    } else {
-        qDebug() << "Error loading departments:" << query.lastError().text();
     }
 }
 
@@ -121,8 +104,6 @@ void HrEditStaff::loadStaffList()
         while (query.next()) {
             staffIds.append(query.value(0).toInt());
         }
-    } else {
-        qDebug() << "Error loading staff list:" << query.lastError().text();
     }
 }
 
@@ -145,8 +126,6 @@ void HrEditStaff::loadSearchSuggestions()
         searchCompleter->setCaseSensitivity(Qt::CaseInsensitive);
         searchCompleter->setFilterMode(Qt::MatchContains);
         ui->lesearch->setCompleter(searchCompleter);
-    } else {
-        qDebug() << "Error loading search suggestions:" << query.lastError().text();
     }
 }
 
@@ -156,7 +135,7 @@ void HrEditStaff::loadStaffData(int staffId)
     query.prepare("SELECT s.fio, s.phone, s.position_name, s.is_work, "
                   "d.department_name, d.address, s.department_id "
                   "FROM staff s "
-                  "JOIN departments d ON s.department_id = d.department_id "
+                  "LEFT JOIN departments d ON s.department_id = d.department_id "
                   "WHERE s.staff_id = :id");
     query.bindValue(":id", staffId);
 
@@ -170,14 +149,16 @@ void HrEditStaff::loadStaffData(int staffId)
         bool isWork = query.value(3).toBool();
         ui->cbiswork->setCurrentIndex(isWork ? 0 : 1);
 
-        QString depString = query.value(4).toString() + " | " + query.value(5).toString();
-        ui->ledepo->setText(depString);
+        if (query.value(6).isNull()) {
+            ui->ledepo->clear();
+        } else {
+            QString depString = query.value(4).toString() + " | " + query.value(5).toString();
+            ui->ledepo->setText(depString);
+        }
 
-        // Обновляем состояние кнопок навигации
         ui->btnback->setEnabled(currentIndex > 0);
         ui->btforward->setEnabled(currentIndex < staffIds.size() - 1);
 
-        // Сбрасываем стиль поля отдела
         ui->ledepo->setStyleSheet("");
     } else {
         QMessageBox::warning(this, "Ошибка", "Не удалось загрузить данные сотрудника");
@@ -244,7 +225,6 @@ void HrEditStaff::on_ledepo_textChanged(const QString &text)
 
 void HrEditStaff::on_lesearch_textChanged(const QString &text)
 {
-    // Просто для визуального контроля
     if (!text.isEmpty() && !text.contains(" | ")) {
         ui->lesearch->setStyleSheet("QLineEdit { background-color: #FFFACD; }");
     } else {
@@ -277,7 +257,6 @@ void HrEditStaff::on_btnsave_clicked()
         return;
     }
 
-    // Проверяем заполнение полей
     if (ui->lefio->text().isEmpty()) {
         QMessageBox::warning(this, "Предупреждение", "Введите ФИО сотрудника");
         ui->lefio->setFocus();
@@ -290,23 +269,18 @@ void HrEditStaff::on_btnsave_clicked()
         return;
     }
 
-    if (ui->ledepo->text().isEmpty()) {
-        QMessageBox::warning(this, "Предупреждение", "Выберите отдел");
-        ui->ledepo->setFocus();
-        return;
+    int departmentId = -1;
+    if (!ui->ledepo->text().isEmpty()) {
+        departmentId = getDepartmentId(ui->ledepo->text());
+        if (departmentId == -1) {
+            QMessageBox::warning(this, "Предупреждение",
+                                 "Отдел не найден в базе данных.\n"
+                                 "Используйте формат: Название отдела | Адрес\n"
+                                 "Выберите отдел из выпадающего списка или оставьте поле пустым");
+            return;
+        }
     }
 
-    // Получаем ID отдела
-    int departmentId = getDepartmentId(ui->ledepo->text());
-    if (departmentId == -1) {
-        QMessageBox::warning(this, "Предупреждение",
-                             "Отдел не найден в базе данных.\n"
-                             "Используйте формат: Название отдела | Адрес\n"
-                             "Выберите отдел из выпадающего списка");
-        return;
-    }
-
-    // Подготавливаем запрос на обновление
     QSqlQuery query(db);
     query.prepare("UPDATE staff SET fio = :fio, phone = :phone, "
                   "position_name = :position, is_work = :is_work, "
@@ -317,7 +291,13 @@ void HrEditStaff::on_btnsave_clicked()
     query.bindValue(":phone", ui->lephone->text().trimmed());
     query.bindValue(":position", ui->leposition->text().trimmed());
     query.bindValue(":is_work", ui->cbiswork->currentData().toBool());
-    query.bindValue(":dep_id", departmentId);
+
+    if (departmentId == -1) {
+        query.bindValue(":dep_id", QVariant(QVariant::Int));
+    } else {
+        query.bindValue(":dep_id", departmentId);
+    }
+
     query.bindValue(":id", currentStaffId);
 
     if (!query.exec()) {
@@ -335,10 +315,7 @@ void HrEditStaff::on_btnsave_clicked()
 
     QMessageBox::information(this, "Успех", "Данные сотрудника обновлены");
 
-    // Обновляем список для поиска
     loadSearchSuggestions();
-
-    // Перезагружаем данные
     loadStaffData(currentStaffId);
 }
 
@@ -349,7 +326,6 @@ void HrEditStaff::on_btndelete_clicked()
         return;
     }
 
-    // Запрашиваем подтверждение с ФИО сотрудника
     QString fio = ui->lefio->text();
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Подтверждение удаления",
                                                               QString("Вы уверены, что хотите удалить сотрудника '%1'?").arg(fio),
@@ -363,22 +339,19 @@ void HrEditStaff::on_btndelete_clicked()
         if (query.exec()) {
             QMessageBox::information(this, "Успех", "Сотрудник удален");
 
-            // Обновляем список сотрудников
             loadStaffList();
             loadSearchSuggestions();
 
-            // Переходим к следующей или предыдущей записи
             if (!staffIds.isEmpty()) {
                 if (currentIndex < staffIds.size()) {
-                    // Загружаем запись на той же позиции (следующая сдвинулась)
+
                     loadStaffData(staffIds[currentIndex]);
                 } else if (currentIndex > 0) {
-                    // Если удалили последнюю запись, переходим к предыдущей
+
                     currentIndex--;
                     loadStaffData(staffIds[currentIndex]);
                 }
             } else {
-                // Список пуст, очищаем поля
                 currentStaffId = -1;
                 currentIndex = -1;
                 ui->lefio->clear();
@@ -390,7 +363,6 @@ void HrEditStaff::on_btndelete_clicked()
                 ui->btforward->setEnabled(false);
             }
         } else {
-            // Проверяем на ограничения внешнего ключа
             QString errorMsg = query.lastError().text();
             if (errorMsg.contains("foreign key") || errorMsg.contains("constraint")) {
                 QMessageBox::critical(this, "Ошибка",
@@ -449,7 +421,6 @@ void HrEditStaff::on_btnsearch_clicked()
 
 void HrEditStaff::on_btnlogout_clicked()
 {
-    // Проверяем, не открыто ли уже окно HrWindow
     QWidget *existingHrWindow = nullptr;
     for (QWidget *widget : QApplication::topLevelWidgets()) {
         if (widget->objectName() == "HrWindow" || widget->inherits("HrWindow")) {
@@ -459,16 +430,13 @@ void HrEditStaff::on_btnlogout_clicked()
     }
 
     if (!existingHrWindow) {
-        // Создаем новое окно HrWindow
         HrWindow *hrWindow = new HrWindow(login, password);
         hrWindow->setAttribute(Qt::WA_DeleteOnClose);
         hrWindow->show();
     } else {
-        // Если окно уже открыто, просто активируем его
         existingHrWindow->activateWindow();
         existingHrWindow->raise();
     }
 
-    // Закрываем текущее окно
     this->close();
 }

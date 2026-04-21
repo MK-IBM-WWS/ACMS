@@ -4,7 +4,6 @@
 #include "dbconfig.h"
 #include <QMessageBox>
 #include <QDate>
-#include <QDebug>
 #include <QApplication>
 #include <QTimer>
 
@@ -31,18 +30,15 @@ HrWindow::~HrWindow()
 {
     if (db.isOpen()) {
         db.close();
-        qDebug() << "Соединение с БД закрыто";
     }
 
     QString connectionName = db.connectionName();
     if (!connectionName.isEmpty()) {
         db = QSqlDatabase();
         QSqlDatabase::removeDatabase(connectionName);
-        qDebug() << "Соединение с БД удалено:" << connectionName;
     }
 
     delete ui;
-    qDebug() << "HrWindow уничтожено";
 }
 
 bool HrWindow::connectToDatabase()
@@ -52,51 +48,35 @@ bool HrWindow::connectToDatabase()
 
     QString connectionName = QString("HR_Connection_%1_%2").arg(m_login);
 
-    qDebug() << "Создание нового соединения с БД:" << connectionName;
-
     db = QSqlDatabase::addDatabase("QPSQL", connectionName);
 
     db.setHostName(config.host);
     db.setPort(config.port);
     db.setDatabaseName("acms");
-    db.setUserName("acms");
-    db.setPassword("CV6Enterprise");
+    db.setUserName(m_login);
+    db.setPassword(m_password);
 
     db.setConnectOptions("connect_timeout=10");
 
-    // Пытаемся открыть соединение
     if (!db.open()) {
-        qDebug() << "Ошибка подключения к БД:" << db.lastError().text();
-        qDebug() << "Детали ошибки:" << db.lastError().driverText();
-        qDebug() << "Код ошибки:" << db.lastError().nativeErrorCode();
         return false;
     }
-
-    qDebug() << "Успешное подключение к БД. Хост:" << config.host
-             << "Порт:" << config.port
-             << "БД: acms";
 
     return true;
 }
 
 bool HrWindow::reconnectToDatabase()
 {
-    qDebug() << "Попытка переподключения к БД...";
-
-    // Закрываем текущее соединение если оно открыто
     if (db.isOpen()) {
         db.close();
     }
 
-    // Пытаемся открыть заново
     bool result = db.open();
 
     if (result) {
-        qDebug() << "Переподключение успешно";
         QMessageBox::information(this, "Подключение восстановлено",
                                  "Соединение с базой данных успешно восстановлено.");
     } else {
-        qDebug() << "Ошибка переподключения:" << db.lastError().text();
         QMessageBox::critical(this, "Ошибка подключения",
                               "Не удалось восстановить соединение с базой данных.\n"
                               "Попробуйте перезапустить приложение.");
@@ -152,11 +132,9 @@ QString HrWindow::translateAccessType(const QString &type)
 QString HrWindow::generatePositionReportHtml(const QString &position)
 {
     if (!db.isOpen()) {
-        qDebug() << "Ошибка: нет подключения к БД";
         return QString();
     }
 
-    // Получаем данные о сотрудниках с указанной должностью
     QSqlQuery query(db);
     query.prepare(R"(
         SELECT s.fio, s.phone, d.department_name
@@ -168,11 +146,9 @@ QString HrWindow::generatePositionReportHtml(const QString &position)
     query.bindValue(":position", position);
 
     if (!query.exec()) {
-        qDebug() << "Ошибка запроса сотрудников по должности:" << query.lastError().text();
         return QString();
     }
 
-    // Формируем строки таблицы
     QStringList staffRows;
     int rowNum = 1;
 
@@ -194,13 +170,11 @@ QString HrWindow::generatePositionReportHtml(const QString &position)
         staffRows << "<tr><td colspan='4' align='center'><i>Нет работающих сотрудников с данной должностью</i></td></tr>";
     }
 
-    // Текущая дата и время
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString dateTimeStr = currentDateTime.toString("dd.MM.yyyy HH:mm:ss");
     QString userLogin = m_login.toHtmlEscaped();
     QString positionEscaped = position.toHtmlEscaped();
 
-    // Формируем HTML
     QString html = R"(
 <!DOCTYPE html>
 <html>
@@ -298,11 +272,9 @@ QString HrWindow::generatePositionReportHtml(const QString &position)
 QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &endDate)
 {
     if (!db.isOpen()) {
-        qDebug() << "Ошибка: нет подключения к БД";
         return QString();
     }
 
-    // Получаем список контроллеров
     QSqlQuery controllersQuery(db);
     controllersQuery.prepare(R"(
         SELECT DISTINCT ac.controller_id, ac.object_name, ac.address
@@ -318,11 +290,9 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
     controllersQuery.bindValue(":end_date", endDate);
 
     if (!controllersQuery.exec()) {
-        qDebug() << "Ошибка запроса контроллеров:" << controllersQuery.lastError().text();
         return QString();
     }
 
-    // Собираем данные по каждому контроллеру
     QStringList controllersHtml;
     int totalAccessFacts = 0;
 
@@ -331,7 +301,6 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
         QString objectName = controllersQuery.value(1).toString().toHtmlEscaped();
         QString address = controllersQuery.value(2).toString().toHtmlEscaped();
 
-        // Получаем факты доступа для данного контроллера
         QSqlQuery factsQuery(db);
         factsQuery.prepare(R"(
             SELECT s.fio, af.pass_id, af.access_time, af.access_type
@@ -347,11 +316,8 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
         factsQuery.bindValue(":end_date", endDate);
 
         if (!factsQuery.exec()) {
-            qDebug() << "Ошибка запроса фактов доступа:" << factsQuery.lastError().text();
             continue;
         }
-
-        // Формируем строки таблицы для контроллера
         QStringList factRows;
         int localCount = 0;
         int rowNum = 1;
@@ -377,7 +343,6 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
             factRows << "<tr><td colspan='5' align='center'><i>Нет данных о доступах за указанный период</i></td></tr>";
         }
 
-        // Формируем блок для контроллера
         QString controllerBlock = R"(
 <!-- Контроллер -->
 <h2>%1</h2>
@@ -426,17 +391,14 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
         controllersHtml << controllerBlock;
     }
 
-    // Если нет данных ни по одному контроллеру
     if (controllersHtml.isEmpty()) {
         controllersHtml << "<p align='center'><i>Нет данных о доступах за указанный период</i></p>";
     }
 
-    // Текущая дата и время
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString dateTimeStr = currentDateTime.toString("dd.MM.yyyy HH:mm:ss");
     QString userLogin = m_login.toHtmlEscaped();
 
-    // Формируем итоговый HTML
     QString html = R"(
 <!DOCTYPE html>
 <html>
@@ -510,7 +472,6 @@ QString HrWindow::generateAccessReportHtml(const QDate &startDate, const QDate &
 </html>
     )";
 
-    // Получаем количество контроллеров
     int controllersCount = 0;
     QSqlQuery countQuery(db);
     countQuery.prepare(R"(
@@ -548,7 +509,6 @@ void HrWindow::on_btnpositionreport_clicked()
         return;
     }
 
-    // Проверяем соединение с БД
     if (!db.isOpen()) {
         QMessageBox::StandardButton reply = QMessageBox::question(this,
                                                                   "Нет подключения",
@@ -565,7 +525,6 @@ void HrWindow::on_btnpositionreport_clicked()
         }
     }
 
-    // Генерируем HTML отчет
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString html = generatePositionReportHtml(position);
     QApplication::restoreOverrideCursor();
@@ -575,7 +534,6 @@ void HrWindow::on_btnpositionreport_clicked()
         return;
     }
 
-    // Открываем окно предварительного просмотра
     PrintWindow *printWindow = new PrintWindow(html);
     printWindow->setAttribute(Qt::WA_DeleteOnClose);
     printWindow->show();
@@ -598,7 +556,6 @@ void HrWindow::on_btnaccessreport_clicked()
         return;
     }
 
-    // Проверяем соединение с БД
     if (!db.isOpen()) {
         QMessageBox::StandardButton reply = QMessageBox::question(this,
                                                                   "Нет подключения",
@@ -615,7 +572,6 @@ void HrWindow::on_btnaccessreport_clicked()
         }
     }
 
-    // Генерируем HTML отчет
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString html = generateAccessReportHtml(start, end);
     QApplication::restoreOverrideCursor();
@@ -625,7 +581,6 @@ void HrWindow::on_btnaccessreport_clicked()
         return;
     }
 
-    // Открываем окно предварительного просмотра
     PrintWindow *printWindow = new PrintWindow(html);
     printWindow->setAttribute(Qt::WA_DeleteOnClose);
     printWindow->show();

@@ -8,7 +8,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
-#include <QDebug>
 #include <QCoreApplication>
 #include <dbconfig.h>
 

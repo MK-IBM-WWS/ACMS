@@ -59,7 +59,6 @@ bool HrAddDepo::addDepartment(const QString &name, const QString &address,
         QString errorText = query.lastError().text();
 
         if (query.lastError().nativeErrorCode() == "23505") {
-            // Проверяем, какое именно ограничение нарушено
             if (errorText.contains("unique_department", Qt::CaseInsensitive)) {
                 QMessageBox::warning(this, "Дубликат отдела",
                                      QString("Отдел с названием '%1' и адресом '%2' уже существует в базе данных.\n"
@@ -92,7 +91,6 @@ void HrAddDepo::clearFields()
 
 void HrAddDepo::on_btnadd_clicked()
 {
-    // Проверяем, что все поля заполнены
     QString name = ui->ledeponame->text().trimmed();
     QString address = ui->leaddress->text().trimmed();
     QString fio = ui->lefio->text().trimmed();
@@ -122,7 +120,6 @@ void HrAddDepo::on_btnadd_clicked()
         return;
     }
 
-    // Добавляем отдел в базу данных
     if (addDepartment(name, address, fio, activity)) {
         QMessageBox::information(this, "Успех", "Отдел успешно добавлен");
         clearFields();
@@ -132,7 +129,6 @@ void HrAddDepo::on_btnadd_clicked()
 
 void HrAddDepo::on_btnlogout_clicked()
 {
-    // Проверяем, не открыто ли уже окно HrWindow
     QWidgetList topLevelWidgets = QApplication::topLevelWidgets();
     HrWindow *existingHrWindow = nullptr;
 
@@ -144,15 +140,12 @@ void HrAddDepo::on_btnlogout_clicked()
     }
 
     if (!existingHrWindow) {
-        // Создаем новое окно HrWindow
         existingHrWindow = new HrWindow(login, password);
         existingHrWindow->show();
     } else {
-        // Если окно уже существует, активируем его
         existingHrWindow->raise();
         existingHrWindow->activateWindow();
     }
 
-    // Закрываем текущее окно
     this->close();
 }

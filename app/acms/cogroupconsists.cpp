@@ -8,20 +8,16 @@ CoGroupConsists::CoGroupConsists(int groupId, QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Устанавливаем заголовок окна
     setWindowTitle("Состав группы доступа");
 
-    // Настраиваем таблицу
     ui->twgroupconsists->setColumnCount(3);
     ui->twgroupconsists->setHorizontalHeaderLabels(QStringList() << "Название объекта" << "Адрес" << "График работы");
     ui->twgroupconsists->horizontalHeader()->setStretchLastSection(true);
     ui->twgroupconsists->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->twgroupconsists->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    // Загружаем информацию о группе
     loadGroupInfo();
 
-    // Загружаем состав группы
     loadGroupConsists();
 }
 

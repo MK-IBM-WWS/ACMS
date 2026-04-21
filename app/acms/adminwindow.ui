@@ -203,13 +203,13 @@
        <property name="minimumSize">
         <size>
          <width>400</width>
-         <height>250</height>
+         <height>260</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>400</width>
-         <height>250</height>
+         <height>260</height>
         </size>
        </property>
        <property name="font">
@@ -238,7 +238,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="btnaddcontrol">
           <property name="font">
            <font>
             <family>Carlito</family>
@@ -252,7 +252,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_8">
+         <widget class="QPushButton" name="btneditcontrol">
           <property name="font">
            <font>
             <family>Carlito</family>
@@ -267,7 +267,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="btnadduser">
           <property name="font">
            <font>
             <family>Carlito</family>
@@ -281,7 +281,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="btnedituser">
           <property name="font">
            <font>
             <family>Carlito</family>
@@ -299,28 +299,30 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="minimumSize">
-        <size>
-         <width>300</width>
-         <height>250</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>300</width>
-         <height>250</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Carlito</family>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">    QGroupBox {
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Carlito</family>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">    QGroupBox {
         border: 1px solid gray;
         border-radius: 5px;
         margin-top: 10px;
@@ -332,28 +334,127 @@
         left: 115px;
         padding: 0 5px 0 5px;
     }</string>
-       </property>
-       <property name="title">
-        <string>Отчеты</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="font">
-           <font>
-            <family>Carlito</family>
-            <pointsize>14</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Отчет о состоянии
+         </property>
+         <property name="title">
+          <string>Отчеты</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QPushButton" name="btncontrolrepo">
+            <property name="font">
+             <font>
+              <family>Carlito</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Отчет о состоянии
 контроллеров доступа</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>Carlito</family>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">    QGroupBox {
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-top: 10px;
+        padding-top: 5px;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+        left: 50px;
+        padding: 0 5px 0 5px;
+    }</string>
+         </property>
+         <property name="title">
+          <string>Очистка данных о доступах</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="font">
+               <font>
+                <family>Carlito</family>
+                <pointsize>12</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Удалить данные о доступах ранее:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="leenddate">
+              <property name="minimumSize">
+               <size>
+                <width>280</width>
+                <height>32</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btndelete">
+            <property name="font">
+             <font>
+              <family>Carlito</family>
+              <pointsize>14</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Удалить данных о доступах</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

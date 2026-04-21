@@ -4,5 +4,6 @@
         <file>logout.png</file>
         <file>search.png</file>
         <file>update.png</file>
+        <file>show.png</file>
     </qresource>
 </RCC>

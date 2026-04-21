@@ -15,7 +15,6 @@ SettingsWindow::~SettingsWindow()
     delete ui;
 }
 
-// Проверка соединения с БД
 bool SettingsWindow::testDbConnection(const DbConfig &config)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
@@ -33,7 +32,6 @@ bool SettingsWindow::testDbConnection(const DbConfig &config)
     return true;
 }
 
-// Загрузка настроек из конфига в UI
 void SettingsWindow::loadSettingsToUi()
 {
     DbConfig config;
@@ -42,7 +40,6 @@ void SettingsWindow::loadSettingsToUi()
     ui->leport->setText(QString::number(config.port));
 }
 
-// Обработчик кнопки проверки подключения
 void SettingsWindow::on_btncheckconn_clicked()
 {
     DbConfig newConfig;
@@ -72,7 +69,6 @@ void SettingsWindow::on_btncheckconn_clicked()
             ui->testatus->setStyleSheet("color: red;");
         }
     } else {
-        // Если подключение не удалось - не меняем конфиг
         ui->testatus->setText("Ошибка: Не удалось подключиться к серверу.\n"
                               "Проверьте хост и порт.\n\n"
                               "Настройки НЕ сохранены.");

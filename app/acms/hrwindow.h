@@ -21,14 +21,10 @@ class HrWindow : public QWidget
 public:
     explicit HrWindow(QString &login, QString &password, QWidget *parent = nullptr);
     ~HrWindow();
-
-    // Методы для работы с БД (публичные, чтобы дочерние окна могли их использовать)
     QSqlDatabase getDatabase() const { return db; }
     bool isDatabaseConnected() const { return db.isOpen(); }
     QString getLogin() const { return m_login; }
     QString getPassword() const { return m_password; }
-
-    // Метод для переподключения к БД (если соединение потеряно)
     bool reconnectToDatabase();
 
 private slots:
@@ -51,7 +47,7 @@ private:
     Ui::HrWindow *ui;
     QString m_login;
     QString m_password;
-    QSqlDatabase db;  // Центральное соединение с БД
+    QSqlDatabase db;
 };
 
 #endif // HRWINDOW_H

@@ -9,7 +9,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFile>
-#include <QDebug>
 #include <dbconfig.h>
 
 QT_BEGIN_NAMESPACE
@@ -27,14 +26,15 @@ public:
 private slots:
     void on_btnlogin_clicked();
     void on_btnsettings_clicked();
+    void on_btnshowpass_clicked();
 
 private:
     Ui::LoginWindow *ui;
     QString role;
-    QString groupPass;
     const QString DB_USERNAME_LOGIN = "loginuser";
     const QString DB_PASSWORD_LOGIN = "CV6";
     const QString DB_NAME = "acms";
+    bool m_passwordVisible;
 
     bool testDbConnection(const DbConfig &config);
     bool authenticateUser(const QString &login, const QString &password);

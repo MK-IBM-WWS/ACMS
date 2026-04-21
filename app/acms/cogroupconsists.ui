@@ -23,7 +23,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>ACMS</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="lw.qrc">
+    <normaloff>:/labels/label.png</normaloff>:/labels/label.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -151,6 +155,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="lw.qrc"/>
+ </resources>
  <connections/>
 </ui>

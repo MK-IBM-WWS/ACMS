@@ -7,12 +7,6 @@ select * from access_controller
 select * from group_consists
 select * from access_facts
 select * from users
-
-INSERT INTO users (login, passphrase, user_role) VALUES
-    ('boris', 'CV', 'Admin'),
-    ('control0', '0', 'Controller'),
-    ('andrey', '228', 'HR'),
-    ('stepan', 'zaonima', 'PD');
 	
 INSERT INTO departments (department_name, address, chief_fio, activity_type) VALUES
 ('Дирекция АЭС', 'г. Удомля, КАЭС, корпус А', 'Тимофеев Андрей Викторович', 'Общее руководство'),
