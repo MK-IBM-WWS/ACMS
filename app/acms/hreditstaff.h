@@ -7,6 +7,7 @@
 #include <QStringListModel>
 #include <QList>
 #include "hrwindow.h"
+#include "printwindow.h"
 
 class HrWindow;
 
@@ -32,6 +33,7 @@ private slots:
     void on_btnlogout_clicked();
     void on_ledepo_textChanged(const QString &text);
     void on_lesearch_textChanged(const QString &text);
+    void on_btnaccessrepo_clicked();
 
 private:
     Ui::HrEditStaff *ui;
@@ -56,6 +58,7 @@ private:
     QString getDepartmentString(int departmentId);
     void navigateToStaff(int direction);
     void loadSearchSuggestions();
+    void generateAccessReport(const QDate &startDate, const QDate &endDate);
 };
 
 #endif // HREDITSTAFF_H

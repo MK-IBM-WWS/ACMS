@@ -4,6 +4,7 @@
 #include "dbconfig.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDateEdit>
 #include <QMessageBox>
 
 HrEditStaff::HrEditStaff(HrWindow *hrWindow, QString &m_login, QString &m_password, int staff_id, QWidget *parent)
@@ -417,6 +418,298 @@ void HrEditStaff::on_btnsearch_clicked()
         QMessageBox::warning(this, "Не найдено",
                              QString("Сотрудник с ФИО '%1' и телефоном '%2' не найден").arg(fio, phone));
     }
+}
+
+void HrEditStaff::on_btnaccessrepo_clicked()
+{
+    if (currentStaffId == -1) {
+        QMessageBox::warning(this, "Предупреждение", "Нет загруженных данных сотрудника");
+        return;
+    }
+
+    QDialog *dateDialog = new QDialog(this);
+    dateDialog->setWindowTitle("Период отчета по фактам доступа");
+    dateDialog->setMinimumSize(350, 150);
+
+    QFormLayout *formLayout = new QFormLayout(dateDialog);
+
+    QDateEdit *startDateEdit = new QDateEdit(QDate::currentDate().addDays(-7));
+    startDateEdit->setCalendarPopup(true);
+    startDateEdit->setDisplayFormat("yyyy-MM-dd");
+
+    QDateEdit *endDateEdit = new QDateEdit(QDate::currentDate());
+    endDateEdit->setCalendarPopup(true);
+    endDateEdit->setDisplayFormat("yyyy-MM-dd");
+
+    formLayout->addRow("Дата начала:", startDateEdit);
+    formLayout->addRow("Дата конца:", endDateEdit);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, dateDialog);
+    formLayout->addRow(buttonBox);
+
+    connect(buttonBox, &QDialogButtonBox::accepted, dateDialog, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, dateDialog, &QDialog::reject);
+
+    if (dateDialog->exec() == QDialog::Accepted) {
+        QDate startDate = startDateEdit->date();
+        QDate endDate = endDateEdit->date();
+
+        if (startDate > endDate) {
+            QMessageBox::warning(this, "Предупреждение",
+                                 "Дата начала не может быть позже даты окончания периода");
+            return;
+        }
+
+        if (endDate > QDate::currentDate()) {
+            QMessageBox::warning(this, "Предупреждение",
+                                 "Дата окончания не может быть позже текущей даты");
+            return;
+        }
+
+        generateAccessReport(startDate, endDate);
+    }
+
+    delete dateDialog;
+}
+
+void HrEditStaff::generateAccessReport(const QDate &startDate, const QDate &endDate)
+{
+    QString fio = ui->lefio->text();
+
+    QDateTime now = QDateTime::currentDateTime();
+    QString dateTimeStr = now.toString("dd.MM.yyyy HH:mm:ss");
+
+    QSqlQuery passQuery(db);
+    passQuery.prepare("SELECT pass_id FROM pass WHERE staff_id = :staff_id");
+    passQuery.bindValue(":staff_id", currentStaffId);
+
+    QList<int> passIds;
+    if (passQuery.exec()) {
+        while (passQuery.next()) {
+            passIds.append(passQuery.value(0).toInt());
+        }
+    }
+
+    if (passIds.isEmpty()) {
+        QMessageBox::information(this, "Информация", "У сотрудника нет пропусков");
+        return;
+    }
+
+    QStringList passIdList;
+    for (int id : passIds) {
+        passIdList.append(QString::number(id));
+    }
+    QString passIdsStr = passIdList.join(", ");
+
+    QSqlQuery controllersQuery(db);
+    QString controllersSql = QString(
+                                 "SELECT DISTINCT ac.controller_id, ac.object_name, ac.address, ac.work_shedule "
+                                 "FROM access_facts af "
+                                 "JOIN access_controller ac ON af.controller_id = ac.controller_id "
+                                 "WHERE af.pass_id IN (%1) "
+                                 "AND af.access_time > '%2'::timestamp "
+                                 "AND af.access_time < '%3'::timestamp "
+                                 "ORDER BY ac.object_name")
+                                 .arg(passIdsStr)
+                                 .arg(startDate.toString("yyyy-MM-dd") + " 00:00:00")
+                                 .arg(endDate.toString("yyyy-MM-dd") + " 23:59:59");
+
+    QString reportGroups;
+    int totalFacts = 0;
+
+    if (controllersQuery.exec(controllersSql)) {
+        while (controllersQuery.next()) {
+            int controllerId = controllersQuery.value(0).toInt();
+            QString objectName = controllersQuery.value(1).toString();
+            QString address = controllersQuery.value(2).toString();
+            QString workSchedule = controllersQuery.value(3).toString();
+
+            QSqlQuery factsQuery(db);
+            factsQuery.prepare(QString(
+                                   "SELECT af.access_time, af.access_type, af.solution "
+                                   "FROM access_facts af "
+                                   "WHERE af.controller_id = :controller_id "
+                                   "AND af.pass_id IN (%1) "
+                                   "AND af.access_time > :start_time::timestamp "
+                                   "AND af.access_time < :end_time::timestamp "
+                                   "ORDER BY af.access_time")
+                                   .arg(passIdsStr));
+
+            factsQuery.bindValue(":controller_id", controllerId);
+            factsQuery.bindValue(":start_time", startDate.toString("yyyy-MM-dd") + " 00:00:00");
+            factsQuery.bindValue(":end_time", endDate.toString("yyyy-MM-dd") + " 23:59:59");
+
+            QString factsRows;
+            int controllerFacts = 0;
+
+            if (factsQuery.exec()) {
+                while (factsQuery.next()) {
+                    QDateTime accessTime = factsQuery.value(0).toDateTime();
+                    QString accessType = factsQuery.value(1).toString();
+                    QString solution = factsQuery.value(2).toString();
+
+                    QString accessTypeRu;
+                    if (accessType == "IN") accessTypeRu = "Вход";
+                    else if (accessType == "OUT") accessTypeRu = "Выход";
+                    else accessTypeRu = accessType;
+
+                    QString solutionRu;
+                    if (solution == "Accepted") solutionRu = "Разрешен";
+                    else if (solution == "Rejected") solutionRu = "Отклонен";
+                    else if (solution == "Pending") solutionRu = "Ожидание";
+                    else solutionRu = solution;
+
+                    factsRows += QString(
+                                     "<tr>"
+                                     "<td align=\"center\">%1</td>"
+                                     "<td>%2</td>"
+                                     "<td align=\"center\">%3</td>"
+                                     "</tr>\n")
+                                     .arg(accessTime.toString("dd.MM.yyyy HH:mm:ss"))
+                                     .arg(accessTypeRu)
+                                     .arg(solutionRu);
+
+                    controllerFacts++;
+                    totalFacts++;
+                }
+            }
+
+            reportGroups += QString(
+                                "<br>\n"
+                                "<h3>Контроллер: %1</h3>\n"
+                                "<table width=\"100%\" border=\"0\" cellpadding=\"5\">\n"
+                                "    <tr>\n"
+                                "        <td width=\"200\"><b>Объект:</b></td>\n"
+                                "        <td>%1</td>\n"
+                                "    </tr>\n"
+                                "    <tr>\n"
+                                "        <td><b>Адрес:</b></td>\n"
+                                "        <td>%2</td>\n"
+                                "    </tr>\n"
+                                "    <tr>\n"
+                                "        <td><b>График работы:</b></td>\n"
+                                "        <td>%3</td>\n"
+                                "    </tr>\n"
+                                "    <tr>\n"
+                                "        <td><b>Количество фактов:</b></td>\n"
+                                "        <td>%4</td>\n"
+                                "    </tr>\n"
+                                "</table>\n"
+                                "<br>\n")
+                                .arg(objectName)
+                                .arg(address.isEmpty() ? "Не указан" : address)
+                                .arg(workSchedule.isEmpty() ? "Не указан" : workSchedule)
+                                .arg(controllerFacts);
+
+            if (controllerFacts > 0) {
+                reportGroups += QString(
+                                    "<table width=\"100%\" border=\"1\" cellpadding=\"8\" cellspacing=\"0\">\n"
+                                    "    <thead>\n"
+                                    "        <tr bgcolor=\"#CCCCCC\">\n"
+                                    "            <th align=\"center\" width=\"200\"><b>Время доступа</b></th>\n"
+                                    "            <th align=\"center\" width=\"150\"><b>Тип доступа</b></th>\n"
+                                    "            <th align=\"center\" width=\"150\"><b>Решение</b></th>\n"
+                                    "        </tr>\n"
+                                    "    </thead>\n"
+                                    "    <tbody>\n"
+                                    "        %1\n"
+                                    "    </tbody>\n"
+                                    "</table>\n"
+                                    "<br>\n")
+                                    .arg(factsRows);
+            } else {
+                reportGroups += "<p>Нет фактов доступа за указанный период</p>\n";
+            }
+        }
+    }
+
+    QString html = QString(R"(
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по фактам доступа сотрудника</title>
+</head>
+<body>
+
+<!-- Заголовок -->
+<h1 align="center">ОТЧЕТ ПО ФАКТАМ ДОСТУПА СОТРУДНИКА</h1>
+<hr width="100%" size="2" noshade>
+
+<!-- Информация об отчете -->
+<p align="right"><b>Дата и время формирования:</b> %1<br>
+<b>Отчет создал:</b> %2</p>
+
+<!-- Информация о сотруднике и фильтре -->
+<table width="100%" border="0" cellpadding="5">
+    <tr>
+        <td width="200"><b>ФИО сотрудника:</b></td>
+        <td>%3</td>
+    </tr>
+    <tr>
+        <td><b>Период отчета:</b></td>
+        <td>с %4 по %5</td>
+    </tr>
+    <tr>
+        <td><b>Общее количество фактов:</b></td>
+        <td>%6</td>
+    </tr>
+</table>
+
+<br>
+
+<!-- Группы по контроллерам -->
+%7
+
+<br>
+<br>
+
+<!-- Подвал -->
+<hr width="100%" size="1">
+<table width="100%" border="0">
+    <tr>
+        <td width="50%">
+            <b>АИС СКУД</b><br>
+            <font size="2">Автоматизированная информационная система<br>
+            контроля и управления доступом</font>
+        </td>
+        <td width="50%" align="right">
+            <font size="2">Документ сгенерирован автоматически<br>
+            Электронная подпись не требуется</font>
+        </td>
+    </tr>
+</table>
+
+<br>
+<br>
+
+<!-- Места для подписей -->
+<table width="100%" border="0">
+    <tr>
+        <td width="50%">
+            Руководитель _______________
+        </td>
+        <td width="50%" align="right">
+            "___" ____________ 20___ г.
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
+    )")
+                       .arg(dateTimeStr)
+                       .arg(login)
+                       .arg(fio)
+                       .arg(startDate.toString("dd.MM.yyyy"))
+                       .arg(endDate.toString("dd.MM.yyyy"))
+                       .arg(totalFacts)
+                       .arg(reportGroups.isEmpty() ? "<p>Нет данных за указанный период</p>" : reportGroups);
+
+    PrintWindow *printWindow = new PrintWindow(html);
+    printWindow->setAttribute(Qt::WA_DeleteOnClose);
+    printWindow->show();
 }
 
 void HrEditStaff::on_btnlogout_clicked()

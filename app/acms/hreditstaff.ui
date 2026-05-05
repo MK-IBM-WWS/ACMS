@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>589</width>
+    <width>637</width>
     <height>308</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>589</width>
+    <width>637</width>
     <height>308</height>
    </size>
   </property>
@@ -442,17 +442,19 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+        <widget class="QPushButton" name="btnaccessrepo">
+         <property name="font">
+          <font>
+           <family>Carlito</family>
+           <pointsize>14</pointsize>
+           <bold>true</bold>
+          </font>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="text">
+          <string>Отчет по
+доступам сотрудника</string>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btndelete">
